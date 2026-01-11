@@ -2,47 +2,112 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Archivo de Educación</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Archivo de Educación | Acervo Digital</title>
     <style>
-        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
-        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; }
-        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #b8860b; }
-        input { width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #eee; margin: 20px 0; box-sizing: border-box; }
-        .item { border-bottom: 1px solid #f0f0f0; padding: 20px 0; }
-        mark { background: #fff59d; }
+        /* ESTILO INSTITUCIONAL C */
+        body { margin: 0; background: #fafafa; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #333; }
+        header { background: #002147; color: #ffffff; padding: 40px 20px; text-align: center; border-bottom: 5px solid #b8860b; }
+        header h1 { margin: 0; font-size: 2.5em; letter-spacing: 1px; }
+        header p { margin: 10px 0 0; opacity: 0.9; font-style: italic; }
+        
+        .container { max-width: 900px; margin: auto; padding: 20px; }
+        
+        /* Sección de descripción */
+        .descripcion-sitio { background: white; padding: 20px; border: 1px solid #e1e1e1; margin-bottom: 30px; line-height: 1.6; border-radius: 4px; }
+        .descripcion-sitio h2 { color: #002147; margin-top: 0; border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .link-archivo { display: inline-block; margin-top: 10px; color: #b8860b; font-weight: bold; text-decoration: none; border: 1px solid #b8860b; padding: 5px 15px; border-radius: 4px; transition: 0.3s; }
+        .link-archivo:hover { background: #b8860b; color: white; }
+
+        /* Buscador */
+        .search-box { position: sticky; top: 10px; z-index: 100; margin-bottom: 40px; }
+        input { width: 100%; padding: 20px; border: 2px solid #002147; border-radius: 5px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); font-size: 1.1em; box-sizing: border-box; }
+
+        /* Resultados */
+        .item { background: white; margin: 25px 0; padding: 30px; border: 1px solid #e1e1e1; border-top: 5px solid #b8860b; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+        .item h3 { margin: 0 0 10px 0; color: #002147; font-size: 1.5em; }
+        .meta { font-size: 0.9em; color: #666; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }
+        .meta span { color: #b8860b; font-weight: bold; }
+        .text { line-height: 1.8; text-align: justify; color: #444; }
+        mark { background: #fff59d; color: #000; font-weight: bold; padding: 0 2px; }
+        
+        footer { text-align: center; padding: 40px; color: #888; font-size: 0.8em; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Archivo de Educación</h1>
-        <input type="text" id="buscador" placeholder="Escribe para buscar...">
-        <div id="resultados"></div>
+
+<header>
+    <h1>Archivo de Educación</h1>
+    <p>Revista Mexicana de Educación y Desarrollo: Paedagogium</p>
+</header>
+
+<div class="container">
+    <section class="descripcion-sitio">
+        <h2>Sobre el Acervo</h2>
+        <p>Bienvenido al buscador digital del <strong>Archivo de Educación</strong>. Este espacio resguarda la memoria intelectual de la revista <em>Paedagogium</em>, facilitando la consulta de artículos, ensayos y reseñas que han moldeado el pensamiento pedagógico en México.</p>
+        <a href="https://fyce.org.mx/paedagogium/" target="_blank" class="link-archivo">📚 Consultar Revistas Originales (PDF)</a>
+    </section>
+
+    <div class="search-box">
+        <input type="text" id="buscador" placeholder="Buscar por tema, autor o palabra clave...">
     </div>
-    <script>
-        let acervo = [];
-        fetch('volumen_12_completo.json')
-            .then(res => res.json())
-            .then(data => { acervo = data.secciones; });
 
-        document.getElementById('buscador').addEventListener('keyup', (e) => {
-            const term = e.target.value.toLowerCase();
-            const resDiv = document.getElementById('resultados');
-            resDiv.innerHTML = '';
-            if (term.length < 3) return;
+    <div id="resultados"></div>
+</div>
 
-            acervo.filter(s => 
-                (s.titulo || "").toLowerCase().includes(term) || 
-                (s.cuerpo_texto || "").toLowerCase().includes(term) ||
-                (s.autor || "").toLowerCase().includes(term)
-            ).forEach(s => {
-                resDiv.innerHTML += `
-                    <div class="item">
-                        <h3>${s.titulo || s.tipo}</h3>
-                        <p><strong>${s.autor || ''}</strong> | Pág: ${s.paginas || s.pagina}</p>
-                        <p>${(s.cuerpo_texto || "").substring(0,200)}...</p>
-                    </div>`;
-            });
+<footer>
+    &copy; 2024 Archivo de Educación. Digitalización y Preservación Documental.
+</footer>
+
+<script>
+    let acervo = [];
+
+    // Cargar el JSON
+    fetch('volumen_12_completo.json')
+        .then(res => res.json())
+        .then(data => {
+            acervo = data.secciones;
+            console.log("Acervo cargado exitosamente");
+        })
+        .catch(err => console.error("Error cargando base de datos", err));
+
+    const input = document.getElementById('buscador');
+    const resDiv = document.getElementById('resultados');
+
+    input.addEventListener('keyup', () => {
+        const term = input.value.toLowerCase();
+        resDiv.innerHTML = '';
+        if (term.length < 3) return;
+
+        const filtered = acervo.filter(s => 
+            (s.titulo || "").toLowerCase().includes(term) || 
+            (s.cuerpo_texto || "").toLowerCase().includes(term) ||
+            (s.autor || "").toLowerCase().includes(term)
+        );
+
+        filtered.forEach(s => {
+            const div = document.createElement('div');
+            div.className = 'item';
+            div.innerHTML = `
+                <div class="meta">Sección: <span>${s.tipo}</span> | Página: <span>${s.paginas || s.pagina}</span></div>
+                <h3>${s.titulo || s.tipo}</h3>
+                <div class="meta">Autor: <span>${s.autor || 'Redacción'}</span></div>
+                <div class="text">${resaltar(s.cuerpo_texto || "", term)}</div>
+            `;
+            resDiv.appendChild(div);
         });
-    </script>
+    });
+
+    function resaltar(texto, query) {
+        if (!texto) return "Contenido informativo.";
+        const index = texto.toLowerCase().indexOf(query);
+        const inicio = Math.max(0, index - 80);
+        const fin = Math.min(texto.length, index + 250);
+        const regex = new RegExp(query, "gi");
+        let fragmento = texto.substring(inicio, fin);
+        return (inicio > 0 ? "..." : "") + fragmento.replace(regex, m => `<mark>${m}</mark>`) + "...";
+    }
+</script>
+
 </body>
 </html>
