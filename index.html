@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Archivo de Educación</title>
+    <style>
+        body { font-family: sans-serif; background: #f4f7f6; padding: 20px; }
+        .container { max-width: 800px; margin: auto; background: white; padding: 30px; border-radius: 12px; }
+        h1 { color: #2c3e50; text-align: center; border-bottom: 3px solid #b8860b; }
+        input { width: 100%; padding: 15px; border-radius: 25px; border: 2px solid #eee; margin: 20px 0; box-sizing: border-box; }
+        .item { border-bottom: 1px solid #f0f0f0; padding: 20px 0; }
+        mark { background: #fff59d; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Archivo de Educación</h1>
+        <input type="text" id="buscador" placeholder="Escribe para buscar...">
+        <div id="resultados"></div>
+    </div>
+    <script>
+        let acervo = [];
+        fetch('volumen_12_completo.json')
+            .then(res => res.json())
+            .then(data => { acervo = data.secciones; });
+
+        document.getElementById('buscador').addEventListener('keyup', (e) => {
+            const term = e.target.value.toLowerCase();
+            const resDiv = document.getElementById('resultados');
+            resDiv.innerHTML = '';
+            if (term.length < 3) return;
+
+            acervo.filter(s => 
+                (s.titulo || "").toLowerCase().includes(term) || 
+                (s.cuerpo_texto || "").toLowerCase().includes(term) ||
+                (s.autor || "").toLowerCase().includes(term)
+            ).forEach(s => {
+                resDiv.innerHTML += `
+                    <div class="item">
+                        <h3>${s.titulo || s.tipo}</h3>
+                        <p><strong>${s.autor || ''}</strong> | Pág: ${s.paginas || s.pagina}</p>
+                        <p>${(s.cuerpo_texto || "").substring(0,200)}...</p>
+                    </div>`;
+            });
+        });
+    </script>
+</body>
+</html>
